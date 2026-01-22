@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/steam-game-randomizer/',
+  base: './',
   build: {
     outDir: 'dist'
   }

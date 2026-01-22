@@ -29,7 +29,7 @@ A simple web app that picks a random game from your Steam library when you can't
 
 ## Usage
 
-1. Enter your Steam ID (the long number, like `76561198000000000`)
+1. Enter your Steam ID (the long number, like `76561198046373486`)
 2. Make sure your Steam profile's "Game details" are set to public
 3. Click "Load My Games" to fetch your library
 4. Click "Pick Another Game" to get a new random suggestion
@@ -41,6 +41,64 @@ npm run build
 ```
 
 The built files will be in the `dist/` directory, ready for deployment to GitHub Pages or any static hosting service.
+
+## Deploying to GitHub Pages
+
+1. Build the project:
+   ```bash
+   npm run build
+   ```
+
+2. **Important**: You need to set your Steam API key as a GitHub secret:
+   - Go to your repository → Settings → Secrets and variables → Actions
+   - Add a new repository secret: `VITE_STEAM_API_KEY` with your Steam API key value
+
+3. **Option A - Manual deployment:**
+   - Copy all files from the `dist/` folder to your repository root
+   - Commit and push to GitHub
+   - Enable GitHub Pages in repository settings
+
+4. **Option B - Automated deployment (recommended):**
+   - Create `.github/workflows/deploy.yml` (see below)
+   - Push your source code to the `main` branch
+   - GitHub Actions will automatically build and deploy
+
+### GitHub Actions Workflow
+
+Create `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build
+      run: npm run build
+      env:
+        VITE_STEAM_API_KEY: ${{ secrets.VITE_STEAM_API_KEY }}
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+```
 
 ## Finding Your Steam ID
 
