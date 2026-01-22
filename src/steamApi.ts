@@ -142,14 +142,22 @@ export class SteamGameRandomizer {
     const hoursPlayed = Math.round(game.playtime_forever / 60 * 10) / 10
     const steamUrl = `https://store.steampowered.com/app/${game.appid}`
     
-    // Steam CDN URL for game logo
-    const logoUrl = game.img_logo_url ? 
-      `https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_logo_url}.jpg` : ''
+    // Steam CDN URLs for different image types
+    const headerImage = `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/header.jpg` // Main store header
+    const capsuleImage = `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/library_600x900.jpg` // Library portrait
+    const heroImage = `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/library_hero.jpg` // Library hero banner
+    const iconUrl = game.img_icon_url ? 
+      `https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg` : ''
     
-    // Start with basic game info
     gameCard.innerHTML = `
       <h3>${game.name}</h3>
-      ${logoUrl ? `<img src="${logoUrl}" alt="${game.name}" onerror="this.style.display='none'" />` : ''}
+      <div class="game-images">
+        <img src="${headerImage}" alt="${game.name} header" class="game-header" onerror="this.style.display='none'" />
+        <div class="game-secondary-images">
+          ${iconUrl ? `<img src="${iconUrl}" alt="${game.name} icon" class="game-icon" onerror="this.style.display='none'" />` : ''}
+          <img src="${capsuleImage}" alt="${game.name} capsule" class="game-capsule" onerror="this.style.display='none'" />
+        </div>
+      </div>
       <p><strong>Hours Played:</strong> ${hoursPlayed}</p>
       <p id="achievements-${game.appid}"><em>Loading achievements...</em></p>
       <p><a href="${steamUrl}" target="_blank" rel="noopener">View on Steam Store</a></p>

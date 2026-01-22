@@ -95,10 +95,37 @@ button:focus-visible {
   font-size: 1.5rem;
 }
 
-.game-card img {
-  max-width: 100%;
-  border-radius: 8px;
+.game-images {
   margin: 1rem 0;
+}
+
+.game-header {
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.game-secondary-images {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.game-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+}
+
+.game-capsule {
+  width: 120px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .game-card p {
