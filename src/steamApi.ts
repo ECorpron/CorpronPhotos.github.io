@@ -62,10 +62,15 @@ export class SteamGameRandomizer {
     this.hideError()
     
     try {
-      // Using Steam Web API with your API key
-      const url = `${this.CORS_PROXY}https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${this.STEAM_API_KEY}&steamid=${this.steamId}&format=json&include_appinfo=true&include_played_free_games=true`
+      // Using Steam Web API with your API key - don't encode the URL for this CORS proxy
+      const steamApiUrl = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${this.STEAM_API_KEY}&steamid=${this.steamId}&format=json&include_appinfo=true&include_played_free_games=true`
+      const url = `${this.CORS_PROXY}${steamApiUrl}`
+      
+      console.log('Making request to:', url)
       
       const response = await axios.get<SteamResponse>(url)
+      
+      console.log('Response:', response.data)
       
       if (!response.data.response || !response.data.response.games) {
         this.showError('No games found. Make sure your Steam ID is correct and your game details are public.')
@@ -84,7 +89,12 @@ export class SteamGameRandomizer {
       
     } catch (error) {
       console.error('Error loading games:', error)
-      this.showError('Failed to load games. Make sure your Steam ID is correct and your game details are public.')
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Response data:', error.response.data)
+        this.showError(`API Error: ${error.response.status} - ${error.response.data}`)
+      } else {
+        this.showError('Failed to load games. Make sure your Steam ID is correct and your game details are public.')
+      }
       this.showLoading(false)
     }
   }
