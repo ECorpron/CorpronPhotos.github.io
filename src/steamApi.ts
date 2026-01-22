@@ -15,12 +15,7 @@ interface SteamResponse {
   }
 }
 
-interface GameDetails {
-  name: string
-  short_description?: string
-  header_image?: string
-  steam_appid: number
-}
+// Removed unused GameDetails interface
 
 export class SteamGameRandomizer {
   private games: SteamGame[] = []
@@ -115,9 +110,7 @@ export class SteamGameRandomizer {
     const hoursPlayed = Math.round(game.playtime_forever / 60 * 10) / 10
     const steamUrl = `https://store.steampowered.com/app/${game.appid}`
     
-    // Steam CDN URLs for game images
-    const iconUrl = game.img_icon_url ? 
-      `https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg` : ''
+    // Steam CDN URL for game logo
     const logoUrl = game.img_logo_url ? 
       `https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_logo_url}.jpg` : ''
     
