@@ -145,7 +145,6 @@ export class SteamGameRandomizer {
     // Steam CDN URLs for different image types
     const headerImage = `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/header.jpg` // Main store header
     const capsuleImage = `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/library_600x900.jpg` // Library portrait
-    const heroImage = `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/library_hero.jpg` // Library hero banner
     const iconUrl = game.img_icon_url ? 
       `https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg` : ''
     
