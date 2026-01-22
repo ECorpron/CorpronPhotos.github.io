@@ -23,7 +23,8 @@ export class SteamGameRandomizer {
   
   // Steam Web API key from environment variables
   private readonly STEAM_API_KEY = import.meta.env.VITE_STEAM_API_KEY
-  private readonly CORS_PROXY = 'https://api.allorigins.win/raw?url='
+  // Try a different CORS proxy
+  private readonly CORS_PROXY = 'https://corsproxy.io/?'
   
   init() {
     this.setupEventListeners()
@@ -62,15 +63,25 @@ export class SteamGameRandomizer {
     this.hideError()
     
     try {
-      // Using Steam Web API with your API key - don't encode the URL for this CORS proxy
-      const steamApiUrl = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${this.STEAM_API_KEY}&steamid=${this.steamId}&format=json&include_appinfo=true&include_played_free_games=true`
-      const url = `${this.CORS_PROXY}${steamApiUrl}`
+      // Try the ISteamUser interface instead - this is more commonly used
+      const steamApiUrl = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${this.STEAM_API_KEY}&steamids=${this.steamId}`
+      const url = `${this.CORS_PROXY}${encodeURIComponent(steamApiUrl)}`
       
-      console.log('Making request to:', url)
+      console.log('Testing with ISteamUser first:', url)
       
-      const response = await axios.get<SteamResponse>(url)
+      // First test if we can reach Steam API at all
+      const testResponse = await axios.get(url)
+      console.log('ISteamUser response:', testResponse.data)
       
-      console.log('Response:', response.data)
+      // If that works, try the games API
+      const gamesApiUrl = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${this.STEAM_API_KEY}&steamid=${this.steamId}&include_appinfo=1&include_played_free_games=1&format=json`
+      const gamesUrl = `${this.CORS_PROXY}${encodeURIComponent(gamesApiUrl)}`
+      
+      console.log('Making games request to:', gamesUrl)
+      
+      const response = await axios.get<SteamResponse>(gamesUrl)
+      
+      console.log('Games response:', response.data)
       
       if (!response.data.response || !response.data.response.games) {
         this.showError('No games found. Make sure your Steam ID is correct and your game details are public.')
@@ -91,7 +102,7 @@ export class SteamGameRandomizer {
       console.error('Error loading games:', error)
       if (axios.isAxiosError(error) && error.response) {
         console.error('Response data:', error.response.data)
-        this.showError(`API Error: ${error.response.status} - ${error.response.data}`)
+        this.showError(`API Error: ${error.response.status} - Check console for details`)
       } else {
         this.showError('Failed to load games. Make sure your Steam ID is correct and your game details are public.')
       }
