@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Steam Game Randomizer</title>
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>🎮 Steam Game Randomizer</h1>
+        <p>Can't decide what to play? Let me pick for you!</p>
+      </header>
+      
+      <main>
+        <div class="input-section">
+          <label for="steamId">Enter your Steam ID:</label>
+          <input type="text" id="steamId" placeholder="76561198000000000" />
+          <button id="loadGames">Load My Games</button>
+        </div>
+        
+        <div id="gameResult" class="game-result hidden">
+          <h2>Your Random Game:</h2>
+          <div id="gameCard" class="game-card">
+            <!-- Game info will be populated here -->
+          </div>
+          <button id="pickAnother">Pick Another Game</button>
+        </div>
+        
+        <div id="loading" class="loading hidden">
+          <p>Loading your games...</p>
+        </div>
+        
+        <div id="error" class="error hidden">
+          <!-- Error messages will appear here -->
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
