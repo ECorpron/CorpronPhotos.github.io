@@ -15,7 +15,18 @@ interface SteamResponse {
   }
 }
 
-// Removed unused GameDetails interface
+interface AchievementStats {
+  playerstats: {
+    steamID: string
+    gameName: string
+    achievements?: Array<{
+      apiname: string
+      achieved: number
+      unlocktime: number
+    }>
+    success: boolean
+  }
+}
 
 export class SteamGameRandomizer {
   private games: SteamGame[] = []
@@ -122,7 +133,7 @@ export class SteamGameRandomizer {
     this.displayGame(selectedGame)
   }
   
-  private displayGame(game: SteamGame) {
+  private async displayGame(game: SteamGame) {
     const gameResult = document.getElementById('gameResult')
     const gameCard = document.getElementById('gameCard')
     
@@ -135,14 +146,54 @@ export class SteamGameRandomizer {
     const logoUrl = game.img_logo_url ? 
       `https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_logo_url}.jpg` : ''
     
+    // Start with basic game info
     gameCard.innerHTML = `
       <h3>${game.name}</h3>
       ${logoUrl ? `<img src="${logoUrl}" alt="${game.name}" onerror="this.style.display='none'" />` : ''}
       <p><strong>Hours Played:</strong> ${hoursPlayed}</p>
+      <p id="achievements-${game.appid}"><em>Loading achievements...</em></p>
       <p><a href="${steamUrl}" target="_blank" rel="noopener">View on Steam Store</a></p>
     `
     
     gameResult.classList.remove('hidden')
+    
+    // Load achievements asynchronously
+    this.loadAchievements(game.appid)
+  }
+  
+  private async loadAchievements(appId: number) {
+    try {
+      const achievementsUrl = `https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?appid=${appId}&key=${this.STEAM_API_KEY}&steamid=${this.steamId}`
+      const url = `${this.CORS_PROXY}${encodeURIComponent(achievementsUrl)}`
+      
+      console.log('Loading achievements for app:', appId)
+      
+      const response = await axios.get<AchievementStats>(url)
+      
+      if (response.data.playerstats && response.data.playerstats.success && response.data.playerstats.achievements) {
+        const achievements = response.data.playerstats.achievements
+        const totalAchievements = achievements.length
+        const unlockedAchievements = achievements.filter(a => a.achieved === 1).length
+        
+        const achievementElement = document.getElementById(`achievements-${appId}`)
+        if (achievementElement) {
+          const percentage = totalAchievements > 0 ? Math.round((unlockedAchievements / totalAchievements) * 100) : 0
+          achievementElement.innerHTML = `<strong>Achievements:</strong> ${unlockedAchievements}/${totalAchievements} (${percentage}%)`
+        }
+      } else {
+        // No achievements or private stats
+        const achievementElement = document.getElementById(`achievements-${appId}`)
+        if (achievementElement) {
+          achievementElement.innerHTML = `<strong>Achievements:</strong> No achievement data available`
+        }
+      }
+    } catch (error) {
+      console.log('Could not load achievements for app:', appId, error)
+      const achievementElement = document.getElementById(`achievements-${appId}`)
+      if (achievementElement) {
+        achievementElement.innerHTML = `<strong>Achievements:</strong> No achievement data available`
+      }
+    }
   }
   
   private showLoading(show: boolean) {
